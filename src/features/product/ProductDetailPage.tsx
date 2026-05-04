@@ -1,35 +1,34 @@
 import { ArrowLeft, Leaf, Minus, Plus, ShoppingCart } from "lucide-react";
-import type { PageId } from "../../app/routes";
-import type { Product } from "../../data/products";
-import { Button } from "../../components/ui/Button";
+import Image from "next/image";
+import Link from "next/link";
+import { routes } from "@/config/navigation";
+import type { Product } from "@/data/products";
+import { AddToCartButton } from "./AddToCartButton";
 
 type ProductDetailPageProps = {
   product: Product;
-  onNavigate: (page: PageId) => void;
-  onAddToCart: (product: Product) => void;
 };
 
-export function ProductDetailPage({
-  product,
-  onNavigate,
-  onAddToCart,
-}: ProductDetailPageProps) {
+export function ProductDetailPage({ product }: ProductDetailPageProps) {
   return (
     <section className="container-page py-12">
-      <button
+      <Link
+        href={routes.shop}
         className="focus-ring mb-8 inline-flex items-center gap-2 rounded text-sm font-semibold text-yxane-ink"
-        onClick={() => onNavigate("shop")}
       >
         <ArrowLeft size={17} />
         Volver a compra
-      </button>
+      </Link>
 
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_480px]">
-        <div className="overflow-hidden rounded-lg bg-yxane-surface">
-          <img
+        <div className="relative min-h-[520px] overflow-hidden rounded-lg bg-yxane-surface">
+          <Image
             src={product.image}
             alt={product.name}
-            className="h-full min-h-[520px] w-full object-cover"
+            fill
+            priority
+            sizes="(min-width: 1024px) calc(100vw - 560px), 100vw"
+            className="object-cover"
           />
         </div>
 
@@ -47,21 +46,29 @@ export function ProductDetailPage({
           <p className="mt-6 leading-7 text-stone-600">{product.description}</p>
 
           <div className="mt-8 flex items-center gap-3">
-            <button className="focus-ring flex h-11 w-11 items-center justify-center rounded-lg border border-yxane-line bg-white">
+            <button
+              className="focus-ring flex h-11 w-11 items-center justify-center rounded-lg border border-yxane-line bg-white"
+              type="button"
+              aria-label="Disminuir cantidad"
+            >
               <Minus size={18} />
             </button>
             <span className="flex h-11 w-14 items-center justify-center rounded-lg border border-yxane-line bg-white font-semibold">
               1
             </span>
-            <button className="focus-ring flex h-11 w-11 items-center justify-center rounded-lg border border-yxane-line bg-white">
+            <button
+              className="focus-ring flex h-11 w-11 items-center justify-center rounded-lg border border-yxane-line bg-white"
+              type="button"
+              aria-label="Aumentar cantidad"
+            >
               <Plus size={18} />
             </button>
           </div>
 
-          <Button className="mt-8 w-full" onClick={() => onAddToCart(product)}>
+          <AddToCartButton product={product} className="mt-8 w-full">
             <ShoppingCart size={18} />
             Agregar al pedido
-          </Button>
+          </AddToCartButton>
 
           <div className="mt-8 grid gap-3 border-t border-yxane-line/70 pt-6 text-sm text-stone-600">
             <p className="flex items-center gap-2">

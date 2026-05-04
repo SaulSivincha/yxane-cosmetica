@@ -1,22 +1,8 @@
 import { Banknote, Leaf, ListFilter } from "lucide-react";
-import type { PageId } from "../../app/routes";
-import type { Product } from "../../data/products";
-import { products } from "../../data/products";
+import { products } from "@/data/products";
 import { ProductCard } from "./ProductCard";
 
-type ShopPageProps = {
-  onNavigate: (page: PageId) => void;
-  onSelectProduct: (product: Product) => void;
-  onAddToCart: (product: Product) => void;
-};
-
-export function ShopPage({
-  onNavigate,
-  onSelectProduct,
-  onAddToCart,
-}: ShopPageProps) {
-  const categories = Array.from(new Set(products.map((product) => product.category)));
-
+export function ShopPage() {
   return (
     <section className="w-full px-6 md:px-12 lg:px-16 grid gap-6 py-14 lg:grid-cols-[220px_auto_1fr]">
       <aside className="h-fit py-2">
@@ -127,12 +113,7 @@ export function ShopPage({
 
         <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {products.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onOpen={onSelectProduct}
-              onAdd={onAddToCart}
-            />
+            <ProductCard key={product.id} product={product} />
           ))}
         </div>
       </div>

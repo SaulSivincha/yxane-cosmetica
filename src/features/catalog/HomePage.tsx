@@ -1,23 +1,14 @@
 import { ArrowRight, MapPin } from "lucide-react";
-import type { PageId } from "../../app/routes";
-import { Button } from "../../components/ui/Button";
-import { Reveal } from "../../components/ui/Reveal";
-import { SectionDivider } from "../../components/ui/SectionDivider";
-import { products } from "../../data/products";
-import type { Product } from "../../data/products";
+import Image from "next/image";
+import Link from "next/link";
+import { routes } from "@/config/navigation";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { Reveal } from "@/components/ui/Reveal";
+import { SectionDivider } from "@/components/ui/SectionDivider";
+import { products } from "@/data/products";
 import { ProductCard } from "./ProductCard";
 
-type HomePageProps = {
-  onNavigate: (page: PageId) => void;
-  onSelectProduct: (product: Product) => void;
-  onAddToCart: (product: Product) => void;
-};
-
-export function HomePage({
-  onNavigate,
-  onSelectProduct,
-  onAddToCart,
-}: HomePageProps) {
+export function HomePage() {
   return (
     <>
       <section className="container-page grid min-h-[calc(100vh-4rem)] items-center gap-12 py-14 lg:grid-cols-[1fr_520px]">
@@ -40,21 +31,21 @@ export function HomePage({
           </Reveal>
           <Reveal animation="fade-in-up" delay={260}>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Button
+              <ButtonLink
+                href={routes.shop}
                 className="transition-transform duration-200 active:scale-[0.97]"
-                onClick={() => onNavigate("shop")}
               >
                 Comprar ahora
                 <ArrowRight size={18} />
-              </Button>
-              <Button
+              </ButtonLink>
+              <ButtonLink
+                href={routes.findUs}
                 variant="secondary"
                 className="transition-transform duration-200 active:scale-[0.97]"
-                onClick={() => onNavigate("find-us")}
               >
                 <MapPin size={18} />
                 Encuéntranos
-              </Button>
+              </ButtonLink>
             </div>
           </Reveal>
         </Reveal>
@@ -64,21 +55,24 @@ export function HomePage({
           delay={180}
         >
           {products.slice(0, 4).map((product, index) => (
-            <div
+            <Link
               key={product.id}
-              onClick={() => onNavigate("shop")}
+              href={routes.shop}
               className={`cursor-pointer overflow-hidden rounded-lg bg-yxane-surface ${
                 index % 2 ? "translate-y-8" : ""
               } transition-transform hover:scale-[1.02] active:scale-[0.98]`}
             >
               <Reveal animation="fade-in-scale" delay={220 + index * 90}>
-                <img
+                <Image
                   src={product.image}
                   alt={product.name}
+                  width={260}
+                  height={325}
+                  sizes="(min-width: 1024px) 260px, 50vw"
                   className="aspect-[4/5] h-full w-full object-cover"
                 />
               </Reveal>
-            </div>
+            </Link>
           ))}
         </Reveal>
       </section>
@@ -98,13 +92,13 @@ export function HomePage({
                 Productos destacados
               </h2>
             </div>
-            <Button
+            <ButtonLink
+              href={routes.shop}
               variant="ghost"
               className="transition-transform duration-200 active:scale-[0.97]"
-              onClick={() => onNavigate("shop")}
             >
               Ver catálogo
-            </Button>
+            </ButtonLink>
           </div>
         </Reveal>
         <div className="grid gap-8 md:grid-cols-3">
@@ -115,11 +109,7 @@ export function HomePage({
               className="transition-transform duration-200 active:scale-[0.98]"
               delay={120 + index * 90}
             >
-              <ProductCard
-                product={product}
-                onOpen={onSelectProduct}
-                onAdd={onAddToCart}
-              />
+              <ProductCard product={product} />
             </Reveal>
           ))}
         </div>

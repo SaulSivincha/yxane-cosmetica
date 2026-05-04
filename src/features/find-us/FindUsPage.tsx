@@ -1,5 +1,6 @@
 import { Instagram, MapPin, MessageCircle, Phone } from "lucide-react";
-import { Button } from "../../components/ui/Button";
+import type { ReactNode } from "react";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 
 export function FindUsPage() {
   return (
@@ -42,10 +43,14 @@ export function FindUsPage() {
       </div>
 
       <div className="mt-12 flex justify-center">
-        <Button>
+        <ButtonLink
+          href="https://wa.me/51956580463"
+          target="_blank"
+          rel="noreferrer"
+        >
           <MessageCircle size={18} />
           Escribir por WhatsApp
-        </Button>
+        </ButtonLink>
       </div>
     </section>
   );
@@ -56,9 +61,9 @@ function InfoCard({
   label,
   children,
 }: {
-  icon: React.ReactNode;
+  icon: ReactNode;
   label: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) {
   return (
     <article className="rounded-lg border border-yxane-line/80 bg-white/75 p-6 text-center shadow-sm">
