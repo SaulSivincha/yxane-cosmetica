@@ -1,7 +1,7 @@
-import type { Product } from "@/data/products";
+import type { Product } from "@/lib/products";
 
 export function priceToNumber(product: Product): number {
-  return Number(product.price.replace("S/", "").trim());
+  return product.price;
 }
 
 export function formatSoles(value: number): string {

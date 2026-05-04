@@ -1,25 +1,47 @@
 import { Banknote, Leaf, ListFilter } from "lucide-react";
-import { products } from "@/data/products";
+import type { Product } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
 
-export function ShopPage() {
+type ShopPageProps = {
+  products: Product[];
+};
+
+function uniqueValues(values: string[]) {
+  return Array.from(new Set(values)).sort((first, second) =>
+    first.localeCompare(second, "es"),
+  );
+}
+
+export function ShopPage({ products }: ShopPageProps) {
+  const categories = uniqueValues(products.map((product) => product.category));
+  const skinNeeds = uniqueValues(
+    products.flatMap((product) => product.skinNeeds),
+  );
+  const maxPrice = Math.ceil(
+    Math.max(0, ...products.map((product) => product.price)),
+  );
+  const hasVeganProducts = products.some((product) => product.isVegan);
+
   return (
     <section className="w-full px-6 md:px-12 lg:px-16 grid gap-6 py-14 lg:grid-cols-[220px_auto_1fr]">
       <aside className="h-fit py-2">
         <div className="mb-8">
-          <h2 className="font-serif text-xl font-bold text-yxane-ink">Filters</h2>
-          <p className="mt-1 text-sm text-stone-500">Refine by botanical properties</p>
+          <h2 className="font-serif text-xl font-bold text-yxane-ink">
+            Filtros
+          </h2>
+          <p className="mt-1 text-sm text-stone-500">
+            Refina por propiedades botánicas
+          </p>
         </div>
 
         <div className="space-y-8">
-          {/* Colecciones */}
           <div>
             <h3 className="mb-4 flex items-center gap-2 font-serif text-xl text-yxane-ink">
               <ListFilter size={20} className="text-yxane-ink" />
               Colecciones
             </h3>
             <div className="space-y-3">
-              {["Aceites naturales", "Aceites esenciales", "Jabones naturales"].map((item) => (
+              {categories.map((item) => (
                 <label key={item} className="flex items-center gap-3 text-sm text-stone-600">
                   <input
                     type="checkbox"
@@ -31,14 +53,13 @@ export function ShopPage() {
             </div>
           </div>
 
-          {/* Filtrar por necesidad */}
           <div>
             <h3 className="mb-4 flex items-center gap-2 font-serif text-xl text-yxane-ink">
               <Leaf size={20} className="text-yxane-ink" />
               Filtrar por necesidad
             </h3>
             <div className="space-y-3">
-              {["Acné", "Piel sensible", "Hidratación", "Relajación"].map((item) => (
+              {skinNeeds.map((item) => (
                 <label key={item} className="flex items-center gap-3 text-sm text-stone-600">
                   <input
                     type="checkbox"
@@ -50,7 +71,6 @@ export function ShopPage() {
             </div>
           </div>
 
-          {/* Rango de precios */}
           <div>
             <h3 className="mb-4 flex items-center gap-2 font-serif text-xl text-yxane-ink">
               <Banknote size={20} className="text-yxane-ink" />
@@ -62,33 +82,31 @@ export function ShopPage() {
               </div>
               <div className="mt-4 flex items-center justify-between text-xs font-medium text-stone-500">
                 <span>S/ 0</span>
-                <span>S/ 200+</span>
+                <span>S/ {maxPrice}+</span>
               </div>
             </div>
           </div>
 
-          {/* Sustainability */}
-          <div>
-            <h3 className="mb-4 flex items-center gap-2 font-serif text-xl text-yxane-ink">
-              <Leaf size={20} className="text-yxane-ink" strokeWidth={1.5} />
-              Sustainability
-            </h3>
-            <div className="space-y-3">
-              {["Vegan", "Cruelty-Free"].map((item) => (
-                <label key={item} className="flex items-center gap-3 text-sm text-stone-600">
+          {hasVeganProducts && (
+            <div>
+              <h3 className="mb-4 flex items-center gap-2 font-serif text-xl text-yxane-ink">
+                <Leaf size={20} className="text-yxane-ink" strokeWidth={1.5} />
+                Valores
+              </h3>
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 text-sm text-stone-600">
                   <input
                     type="checkbox"
                     className="h-4 w-4 rounded border-stone-300 text-yxane-ink focus:ring-yxane-ink"
                   />
-                  {item}
+                  Vegano
                 </label>
-              ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </aside>
 
-      {/* Vertical divider */}
       <div className="hidden lg:flex flex-col items-center px-4" aria-hidden="true">
         <div className="flex-1 w-px bg-stone-200" />
         <div className="py-5">

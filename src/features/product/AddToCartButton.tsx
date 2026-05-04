@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/Button";
-import type { Product } from "@/data/products";
+import type { Product } from "@/lib/products";
 import { useCart } from "@/providers/cart-provider";
 
 type AddToCartButtonProps = {

@@ -2,7 +2,8 @@ import { ArrowLeft, Leaf, Minus, Plus, ShoppingCart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { routes } from "@/config/navigation";
-import type { Product } from "@/data/products";
+import { formatSoles } from "@/lib/currency";
+import type { Product } from "@/lib/products";
 import { AddToCartButton } from "./AddToCartButton";
 
 type ProductDetailPageProps = {
@@ -23,8 +24,8 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
       <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_480px]">
         <div className="relative min-h-[520px] overflow-hidden rounded-lg bg-yxane-surface">
           <Image
-            src={product.image}
-            alt={product.name}
+            src={product.imageUrl}
+            alt={product.title}
             fill
             priority
             sizes="(min-width: 1024px) calc(100vw - 560px), 100vw"
@@ -37,11 +38,13 @@ export function ProductDetailPage({ product }: ProductDetailPageProps) {
             {product.category}
           </p>
           <h1 className="mt-4 font-serif text-4xl leading-tight text-yxane-ink">
-            {product.name}
+            {product.title}
           </h1>
-          <p className="mt-3 text-stone-500">{product.size}</p>
+          {product.presentation && (
+            <p className="mt-3 text-stone-500">{product.presentation}</p>
+          )}
           <p className="mt-6 text-2xl font-semibold text-yxane-ink">
-            {product.price}
+            {formatSoles(product.price)}
           </p>
           <p className="mt-6 leading-7 text-stone-600">{product.description}</p>
 

@@ -7,9 +7,8 @@ import {
   useMemo,
   useState,
 } from "react";
-import { checkoutProducts } from "@/data/products";
 import { priceToNumber } from "@/lib/currency";
-import type { Product } from "@/data/products";
+import type { Product } from "@/lib/products";
 import type { CartItem } from "@/types/cart";
 
 type CartContextValue = {
@@ -29,13 +28,8 @@ type CartContextValue = {
 
 const CartContext = createContext<CartContextValue | undefined>(undefined);
 
-const initialItems: CartItem[] = checkoutProducts.map((product) => ({
-  product,
-  quantity: 1,
-}));
-
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, setItems] = useState<CartItem[]>(initialItems);
+  const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
   function addItem(product: Product) {

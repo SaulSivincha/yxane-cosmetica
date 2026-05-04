@@ -5,10 +5,14 @@ import { routes } from "@/config/navigation";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Reveal } from "@/components/ui/Reveal";
 import { SectionDivider } from "@/components/ui/SectionDivider";
-import { products } from "@/data/products";
+import type { Product } from "@/lib/products";
 import { ProductCard } from "./ProductCard";
 
-export function HomePage() {
+type HomePageProps = {
+  products: Product[];
+};
+
+export function HomePage({ products }: HomePageProps) {
   return (
     <>
       <section className="container-page grid min-h-[calc(100vh-4rem)] items-center gap-12 py-14 lg:grid-cols-[1fr_520px]">
@@ -64,8 +68,8 @@ export function HomePage() {
             >
               <Reveal animation="fade-in-scale" delay={220 + index * 90}>
                 <Image
-                  src={product.image}
-                  alt={product.name}
+                  src={product.imageUrl}
+                  alt={product.title}
                   width={260}
                   height={325}
                   sizes="(min-width: 1024px) 260px, 50vw"

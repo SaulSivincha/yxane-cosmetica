@@ -161,8 +161,8 @@ export function CartDrawer() {
                       className="flex gap-4 border-b border-stone-200/60 pb-6 last:border-0 last:pb-0"
                     >
                       <Image
-                        src={item.product.image}
-                        alt={item.product.name}
+                        src={item.product.imageUrl}
+                        alt={item.product.title}
                         width={80}
                         height={96}
                         sizes="80px"
@@ -171,19 +171,22 @@ export function CartDrawer() {
                       <div className="flex flex-1 flex-col pt-1">
                         <div className="flex justify-between">
                           <h3 className="pr-4 font-serif text-[15px] font-bold text-yxane-ink">
-                            {item.product.name}
+                            {item.product.title}
                           </h3>
                           <button
                             className="h-fit text-stone-400 transition-colors hover:text-red-500"
                             onClick={() => removeItem(item.product.id)}
                             type="button"
-                            aria-label={`Quitar ${item.product.name}`}
+                            aria-label={`Quitar ${item.product.title}`}
                           >
                             <Trash2 size={16} />
                           </button>
                         </div>
                         <p className="mb-3 text-xs text-stone-500">
-                          {item.product.category} • {item.product.size}
+                          {item.product.category}
+                          {item.product.presentation
+                            ? ` • ${item.product.presentation}`
+                            : ""}
                         </p>
                         <div className="mt-auto flex items-center justify-between">
                           <span className="font-medium text-stone-700">
@@ -196,7 +199,7 @@ export function CartDrawer() {
                               className="cursor-pointer text-stone-400 hover:text-yxane-ink"
                               onClick={() => decreaseItem(item.product.id)}
                               type="button"
-                              aria-label={`Disminuir ${item.product.name}`}
+                              aria-label={`Disminuir ${item.product.title}`}
                             >
                               -
                             </button>
@@ -207,7 +210,7 @@ export function CartDrawer() {
                               className="cursor-pointer text-stone-400 hover:text-yxane-ink"
                               onClick={() => increaseItem(item.product.id)}
                               type="button"
-                              aria-label={`Aumentar ${item.product.name}`}
+                              aria-label={`Aumentar ${item.product.title}`}
                             >
                               +
                             </button>
@@ -328,10 +331,11 @@ export function CartDrawer() {
                       </div>
                       <div className="flex-1">
                         <p className="pr-4 text-[13px] leading-tight text-yxane-ink">
-                          {item.product.name}
+                          {item.product.title}
                         </p>
                         <p className="text-[12px] text-stone-500">
-                          {item.quantity} x {item.product.size}
+                          {item.quantity} x{" "}
+                          {item.product.presentation ?? "producto"}
                         </p>
                       </div>
                       <span className="text-[13px] text-stone-700">
