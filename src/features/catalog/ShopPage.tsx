@@ -1,5 +1,9 @@
-import { Banknote, Leaf, ListFilter } from "lucide-react";
+"use client";
+
+import { useMemo, useState } from "react";
+import { Banknote, Leaf, ListFilter, X } from "lucide-react";
 import type { Product } from "@/lib/products";
+import { formatSoles } from "@/lib/currency";
 import { ProductCard } from "./ProductCard";
 
 type ShopPageProps = {
@@ -13,14 +17,58 @@ function uniqueValues(values: string[]) {
 }
 
 export function ShopPage({ products }: ShopPageProps) {
-  const categories = uniqueValues(products.map((product) => product.category));
-  const skinNeeds = uniqueValues(
-    products.flatMap((product) => product.skinNeeds),
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedNeeds, setSelectedNeeds] = useState<string[]>([]);
+  const [onlyVegan, setOnlyVegan] = useState(false);
+
+  const categories = useMemo(
+    () => uniqueValues(products.map((product) => product.category)),
+    [products],
   );
-  const maxPrice = Math.ceil(
-    Math.max(0, ...products.map((product) => product.price)),
+  const skinNeeds = useMemo(
+    () => uniqueValues(products.flatMap((product) => product.skinNeeds)),
+    [products],
   );
+  const maxPrice = useMemo(
+    () => Math.ceil(Math.max(0, ...products.map((product) => product.price))),
+    [products],
+  );
+  const [priceLimit, setPriceLimit] = useState(maxPrice);
   const hasVeganProducts = products.some((product) => product.isVegan);
+
+  const effectivePriceLimit = Math.min(priceLimit, maxPrice);
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      selectedCategories.length === 0 ||
+      selectedCategories.includes(product.category);
+    const matchesNeed =
+      selectedNeeds.length === 0 ||
+      selectedNeeds.some((need) => product.skinNeeds.includes(need));
+    const matchesPrice = product.price <= effectivePriceLimit;
+    const matchesVegan = !onlyVegan || product.isVegan;
+
+    return matchesCategory && matchesNeed && matchesPrice && matchesVegan;
+  });
+  const hasActiveFilters =
+    selectedCategories.length > 0 ||
+    selectedNeeds.length > 0 ||
+    onlyVegan ||
+    effectivePriceLimit < maxPrice;
+
+  function toggleValue(value: string, selected: string[], setSelected: (values: string[]) => void) {
+    setSelected(
+      selected.includes(value)
+        ? selected.filter((selectedValue) => selectedValue !== value)
+        : [...selected, value],
+    );
+  }
+
+  function clearFilters() {
+    setSelectedCategories([]);
+    setSelectedNeeds([]);
+    setOnlyVegan(false);
+    setPriceLimit(maxPrice);
+  }
 
   return (
     <section className="w-full px-6 md:px-12 lg:px-16 grid gap-6 py-14 lg:grid-cols-[220px_auto_1fr]">
@@ -45,6 +93,10 @@ export function ShopPage({ products }: ShopPageProps) {
                 <label key={item} className="flex items-center gap-3 text-sm text-stone-600">
                   <input
                     type="checkbox"
+                    checked={selectedCategories.includes(item)}
+                    onChange={() =>
+                      toggleValue(item, selectedCategories, setSelectedCategories)
+                    }
                     className="h-4 w-4 rounded border-stone-300 text-yxane-ink focus:ring-yxane-ink"
                   />
                   {item}
@@ -63,6 +115,10 @@ export function ShopPage({ products }: ShopPageProps) {
                 <label key={item} className="flex items-center gap-3 text-sm text-stone-600">
                   <input
                     type="checkbox"
+                    checked={selectedNeeds.includes(item)}
+                    onChange={() =>
+                      toggleValue(item, selectedNeeds, setSelectedNeeds)
+                    }
                     className="h-4 w-4 rounded border-stone-300 text-yxane-ink focus:ring-yxane-ink"
                   />
                   {item}
@@ -77,12 +133,17 @@ export function ShopPage({ products }: ShopPageProps) {
               Rango de precios
             </h3>
             <div className="px-1">
-              <div className="relative h-[2px] w-full bg-stone-200">
-                <div className="absolute inset-y-0 left-0 right-0 bg-stone-500"></div>
-              </div>
+              <input
+                type="range"
+                min={0}
+                max={maxPrice}
+                value={effectivePriceLimit}
+                onChange={(event) => setPriceLimit(Number(event.target.value))}
+                className="w-full accent-yxane-ink"
+              />
               <div className="mt-4 flex items-center justify-between text-xs font-medium text-stone-500">
                 <span>S/ 0</span>
-                <span>S/ {maxPrice}+</span>
+                <span>{formatSoles(effectivePriceLimit)}</span>
               </div>
             </div>
           </div>
@@ -97,12 +158,25 @@ export function ShopPage({ products }: ShopPageProps) {
                 <label className="flex items-center gap-3 text-sm text-stone-600">
                   <input
                     type="checkbox"
+                    checked={onlyVegan}
+                    onChange={(event) => setOnlyVegan(event.target.checked)}
                     className="h-4 w-4 rounded border-stone-300 text-yxane-ink focus:ring-yxane-ink"
                   />
                   Vegano
                 </label>
               </div>
             </div>
+          )}
+
+          {hasActiveFilters && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="focus-ring inline-flex items-center gap-2 rounded border border-yxane-line px-3 py-2 text-sm font-semibold text-yxane-ink transition-colors hover:border-yxane-ink"
+            >
+              <X size={16} />
+              Limpiar filtros
+            </button>
           )}
         </div>
       </aside>
@@ -127,13 +201,22 @@ export function ShopPage({ products }: ShopPageProps) {
             Productos reales del catálogo Yxane, organizados para explorar,
             comparar y construir un pedido con intención.
           </p>
+          <p className="mt-4 text-sm font-semibold text-yxane-ink">
+            {filteredProducts.length} de {products.length} productos
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {filteredProducts.length > 0 ? (
+          <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+            {filteredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg border border-yxane-line bg-yxane-surface/40 p-8 text-stone-600">
+            No hay productos que coincidan con esos filtros.
+          </div>
+        )}
       </div>
     </section>
   );

@@ -25,6 +25,8 @@ const products = [
       "Tratamiento ligero para piel grasa con acabado fresco y rutina nocturna.",
     skinNeeds: ["Acné", "Control de grasa"],
     tags: ["rostro", "noche", "bha"],
+    isVegan: true,
+    stock: 18,
     sortOrder: 10,
   },
   {
@@ -38,6 +40,7 @@ const products = [
     description: "Barra artesanal para una limpieza suave y luminosa.",
     skinNeeds: ["Luminosidad"],
     tags: ["limpieza", "artesanal"],
+    stock: 32,
     sortOrder: 20,
   },
   {
@@ -51,6 +54,8 @@ const products = [
     description: "Aceite aromático para rituales de cuidado y calma.",
     skinNeeds: ["Relajación"],
     tags: ["aceite", "aromático"],
+    isVegan: true,
+    stock: 14,
     sortOrder: 30,
   },
   {
@@ -64,6 +69,8 @@ const products = [
     description: "Mascarilla iluminadora con textura fina y acabado suave.",
     skinNeeds: ["Luminosidad"],
     tags: ["mascarilla", "vitamina c"],
+    isVegan: true,
+    stock: 20,
     sortOrder: 40,
   },
   {
@@ -72,11 +79,14 @@ const products = [
     title: "Anti age Ácido hialurónico l. 5%",
     presentation: "30ml",
     price: 38,
+    compareAtPrice: 42,
     imageUrl:
       "https://lh3.googleusercontent.com/aida-public/AB6AXuB0w06EQsJWCnb-VkDDjK5UkZoUvLRd1m5CI_m390a4Xlv028qZ1afTgmSsqsK0_-DOyjW7VMqA4md4MxlpeT7MWZBprasg6ybV8s-hYhbORRq6_gSHtmGXBIeaYufhKum6NTSTOC1w_dQeQTcRMhThHUB04NNfwJhsiuNfSk4sgZXyC9GIpKE017BrhBZb6sE3tnsKzfGv14-EBW_DBdLXyu0_NK_QV4GSqaJK1pB_bCMRHlz7KDr92kF6OeFkoN8CYo5TWgmm-A",
     description: "Sérum hidratante para una rutina de noche más flexible.",
     skinNeeds: ["Hidratación", "Antiedad"],
     tags: ["rostro", "ácido hialurónico"],
+    isVegan: true,
+    stock: 16,
     sortOrder: 50,
   },
   {
@@ -90,6 +100,8 @@ const products = [
     description: "Jabón botánico con carácter cálido y artesanal.",
     skinNeeds: ["Luminosidad"],
     tags: ["limpieza", "artesanal"],
+    isVegan: true,
+    stock: 28,
     sortOrder: 60,
   },
   {
@@ -103,6 +115,7 @@ const products = [
     description: "Fórmula cremosa para una sensación de piel descansada.",
     skinNeeds: ["Piel sensible", "Hidratación"],
     tags: ["mascarilla", "avena"],
+    stock: 22,
     sortOrder: 70,
   },
   {
@@ -116,6 +129,8 @@ const products = [
     description: "Aceite versátil para rostro, puntas y masaje facial.",
     skinNeeds: ["Hidratación"],
     tags: ["aceite", "rostro", "cabello"],
+    isVegan: true,
+    stock: 12,
     sortOrder: 80,
   },
   {
@@ -129,7 +144,55 @@ const products = [
     description: "Activo funcional para textura visible y rutina constante.",
     skinNeeds: ["Control de grasa", "Luminosidad"],
     tags: ["rostro", "vitamina b3"],
+    isVegan: true,
+    stock: 18,
     sortOrder: 90,
+  },
+  {
+    slug: "aceite-esencial-lavanda",
+    category: "Aceites esenciales",
+    title: "Aceite esencial de Lavanda",
+    presentation: "10ml",
+    price: 28,
+    imageUrl:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDBRmDwsdRjvlA9AsF8DQ-8WBeDvjcXZn9ONc4khWkaMAG8v9jLd43te4vLJRzbcALwyfbEJ84ueiyMfO0d2s7NzoYxXLVRo57PFreUhJaRvXZZ-vVJ9xgh9hHvi2YjVrwK98sT0wwmwIKNTz8L1DhIszCSJf6AvSDjShdqAaz8aw1iObWqVMcjT7FZmZ6EatUikBlzykXrsR4O3uvt6slJGqEGi0W0B7-R-EbXLPv6oiKDiyMPPpThp9_vZJUdhkNkxPFHK5mc_Q",
+    description: "Aceite esencial floral para rutinas de descanso y masaje.",
+    skinNeeds: ["Relajación", "Piel sensible"],
+    tags: ["aceite esencial", "lavanda", "aromaterapia"],
+    isVegan: true,
+    stock: 10,
+    sortOrder: 100,
+  },
+  {
+    slug: "serum-vitamina-c",
+    category: "Sérum",
+    title: "Sérum vitamina C iluminador",
+    presentation: "30ml",
+    price: 36,
+    compareAtPrice: 40,
+    imageUrl:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDmmyDikNpxYshBj0xtalw-zVcXWAcn5OFs8WaBmtuMkvxrgFg2XYOorsg0BiqqwE1wKN0St4F61w9KT6ez57UhE_zgm_nqt_WLzyfvDVDpShmNSBZF5hd451XAyxjK3gVZT9E__EYVXomSqrezKDRYpkwXR33343cS-0ruE4G0luL06LVt2y279twb7I3gnfQjjZn_HzgO_ed4VVmTZwJBINKqIuscDhoGxcAKM2bkTS98Pv44MIJxUt_g_6k1T37SO8EBsMkGBw",
+    description: "Sérum antioxidante para tono apagado y manchas visibles.",
+    skinNeeds: ["Luminosidad", "Manchas"],
+    tags: ["rostro", "vitamina c", "día"],
+    isVegan: true,
+    stock: 15,
+    sortOrder: 110,
+  },
+  {
+    slug: "jabon-carbon-activado",
+    category: "Jabones naturales",
+    title: "Jabón de carbón activado",
+    presentation: "95g",
+    price: 9,
+    imageUrl:
+      "https://lh3.googleusercontent.com/aida-public/AB6AXuDaEQfOuqg_IFd4BEoAg7wgLZRIkLLLFgsR6qzQssxhEGN5dAPBwyhoFvzlRZIQEScZbZa0pX7llVcJ5LmPmg15u_FW4LadlYLvcqA5wwYhTIHgVsqVeTljfUDKJKeIaSRV8hSPSuh013nXQLZRWCTgY2a7-2XD-tJRHcdmVk8ZiGEUB1Bnrd5me2kN8cOq_ID12I3DB7lw7JqH4SkGdK-USoSA1xiBjeOy3mA_bfUbuOK9xhHzlQKDr7vWdJW-FRdR66Yk1eLkLQ",
+    description: "Barra purificante para limpieza profunda de piel grasa.",
+    skinNeeds: ["Acné", "Control de grasa"],
+    tags: ["limpieza", "carbón activado", "artesanal"],
+    isVegan: true,
+    stock: 26,
+    sortOrder: 120,
   },
 ];
 
