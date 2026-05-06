@@ -8,14 +8,15 @@ import { Navbar } from "@/components/layout/Navbar";
 
 export function SiteLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const isAdminRoute = pathname.startsWith("/admin");
 
   return (
     <div className="min-h-screen bg-yxane-paper">
-      <Navbar />
-      <main className="pt-16">
+      {!isAdminRoute && <Navbar />}
+      <main className={isAdminRoute ? "" : "pt-16"}>
         <PageTransition pageKey={pathname}>{children}</PageTransition>
       </main>
-      <CartDrawer />
+      {!isAdminRoute && <CartDrawer />}
     </div>
   );
 }

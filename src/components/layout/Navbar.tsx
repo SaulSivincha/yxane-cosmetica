@@ -57,13 +57,13 @@ export function Navbar() {
             </span>
           )}
         </button>
-        <button
+        <Link
+          href={routes.admin}
           aria-label="Cuenta"
           className="focus-ring flex h-10 w-10 items-center justify-center rounded-full hover:bg-yxane-surface"
-          type="button"
         >
           <UserRound size={20} />
-        </button>
+        </Link>
       </div>
     </nav>
   );

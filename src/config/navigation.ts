@@ -10,6 +10,8 @@ export const routes = {
   home: "/",
   shop: "/compra",
   findUs: "/encuentranos",
+  admin: "/admin",
+  adminLogin: "/admin/login",
   product: (productId: string) => `/productos/${productId}`,
 } as const;
 
