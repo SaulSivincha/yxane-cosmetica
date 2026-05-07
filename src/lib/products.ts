@@ -49,7 +49,7 @@ function toProduct(product: Awaited<ReturnType<typeof prisma.product.findFirst>>
   };
 }
 
-export async function getProducts() {
+export async function getProducts(): Promise<Product[]> {
   noStore();
 
   const products = await prisma.product.findMany({
@@ -60,7 +60,7 @@ export async function getProducts() {
   return products.map(toProduct);
 }
 
-export async function getProductBySlug(slug: string) {
+export async function getProductBySlug(slug: string): Promise<Product | null> {
   noStore();
 
   const product = await prisma.product.findFirst({
@@ -73,7 +73,7 @@ export async function getProductBySlug(slug: string) {
   return product ? toProduct(product) : null;
 }
 
-export async function getProductSlugs() {
+export async function getProductSlugs(): Promise<string[]> {
   const products = await prisma.product.findMany({
     where: { isActive: true },
     select: { slug: true },
