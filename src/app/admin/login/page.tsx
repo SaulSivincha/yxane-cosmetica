@@ -16,7 +16,7 @@ export default async function Page() {
   const admin = await getCurrentAdmin();
 
   if (admin) {
-    redirect("/admin/productos");
+    redirect("/admin/pedidos");
   }
 
   const showRegisterLink = await canRegisterAdmin();

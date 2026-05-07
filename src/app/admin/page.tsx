@@ -5,5 +5,5 @@ export const dynamic = "force-dynamic";
 
 export default async function Page() {
   await requireAdmin();
-  redirect("/admin/productos");
+  redirect("/admin/pedidos");
 }

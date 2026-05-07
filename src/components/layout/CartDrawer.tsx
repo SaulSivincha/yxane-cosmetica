@@ -3,9 +3,9 @@
 import {
   ArrowRight,
   CheckCircle2,
-  CreditCard,
-  MapPin,
-  Store,
+  Loader2,
+  MessageCircle,
+  Smartphone,
   Trash2,
   X,
 } from "lucide-react";
@@ -17,23 +17,105 @@ import { useCart } from "@/providers/cart-provider";
 
 type CheckoutStep = 1 | 2 | 3;
 
+type CheckoutForm = {
+  customerName: string;
+  customerPhone: string;
+  customerDni: string;
+  customerEmail: string;
+  notes: string;
+};
+
+const initialForm: CheckoutForm = {
+  customerName: "",
+  customerPhone: "",
+  customerDni: "",
+  customerEmail: "",
+  notes: "",
+};
+
+const yapeNumber = process.env.NEXT_PUBLIC_YAPE_NUMBER || "993166304";
+const igvRate = 0.18;
+
 export function CartDrawer() {
   const {
     items,
     subtotal,
-    shipping,
     total,
     isCartOpen,
     closeCart,
     removeItem,
     increaseItem,
     decreaseItem,
+    clearCart,
   } = useCart();
   const [step, setStep] = useState<CheckoutStep>(1);
+  const [form, setForm] = useState<CheckoutForm>(initialForm);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   function handleClose() {
     setStep(1);
+    setError("");
     closeCart();
+  }
+
+  function updateField(field: keyof CheckoutForm, value: string) {
+    setError("");
+    setForm((current) => ({ ...current, [field]: value }));
+  }
+
+  function validateStepTwo() {
+    return (
+      form.customerName.trim() &&
+      form.customerPhone.trim() &&
+      form.customerDni.trim() &&
+      form.customerEmail.trim()
+    );
+  }
+
+  async function createOrder() {
+    if (!validateStepTwo()) {
+      setError("Completa nombre, WhatsApp, DNI y email.");
+      setStep(2);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError("");
+
+    try {
+      const response = await fetch("/api/orders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...form,
+          items: items.map((item) => ({
+            productId: item.product.id,
+            quantity: item.quantity,
+          })),
+        }),
+      });
+      const data = (await response.json()) as {
+        error?: string;
+        whatsappUrl?: string;
+      };
+
+      if (!response.ok || !data.whatsappUrl) {
+        throw new Error(data.error || "No se pudo crear el pedido.");
+      }
+
+      clearCart();
+      setForm(initialForm);
+      window.location.href = data.whatsappUrl;
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : "No se pudo crear el pedido.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -70,83 +152,36 @@ export function CartDrawer() {
 
         <div className="border-b border-stone-200/60 px-6 py-4">
           <div className="mb-2 flex items-center gap-2">
-            <button
-              className={`focus-ring flex flex-1 flex-col items-start gap-2 rounded-sm ${
-                step >= 1 ? "cursor-pointer hover:opacity-80" : "cursor-default"
-              }`}
+            <StepButton
+              label="Carrito"
+              isActive={step === 1}
+              isDone={step > 1}
+              align="start"
               onClick={() => step > 1 && setStep(1)}
-              disabled={step === 1}
-              type="button"
-              aria-label="Ir a carrito"
-            >
-              <div
-                className={`w-full rounded-full transition-all duration-300 ${
-                  step === 1
-                    ? "h-[3.5px] bg-yxane-ink"
-                    : step > 1
-                      ? "h-[2px] bg-emerald-700/30"
-                      : "h-[2px] bg-stone-200"
-                }`}
-              />
-              <span
-                className={`text-[12px] font-medium ${
-                  step >= 1 ? "text-yxane-ink" : "text-stone-400"
-                }`}
-              >
-                Carrito
-              </span>
-            </button>
-
-            <button
-              className={`focus-ring flex flex-1 flex-col items-center gap-2 rounded-sm ${
-                step >= 2 ? "cursor-pointer hover:opacity-80" : "cursor-default"
-              }`}
+            />
+            <StepButton
+              label="Datos"
+              isActive={step === 2}
+              isDone={step > 2}
+              align="center"
               onClick={() => step > 2 && setStep(2)}
-              disabled={step <= 2}
-              type="button"
-              aria-label="Ir a datos"
-            >
-              <div
-                className={`w-full rounded-full transition-all duration-300 ${
-                  step === 2
-                    ? "h-[3.5px] bg-yxane-ink"
-                    : step > 2
-                      ? "h-[2px] bg-emerald-700/30"
-                      : "h-[2px] bg-stone-200"
-                }`}
-              />
-              <span
-                className={`text-[12px] font-medium ${
-                  step >= 2 ? "text-yxane-ink" : "text-stone-400"
-                }`}
-              >
-                Datos
-              </span>
-            </button>
-
-            <button
-              className="focus-ring flex flex-1 cursor-default flex-col items-end gap-2 rounded-sm"
-              disabled
-              type="button"
-              aria-label="Ir a pago"
-            >
-              <div
-                className={`w-full rounded-full transition-all duration-300 ${
-                  step === 3 ? "h-[3.5px] bg-yxane-ink" : "h-[2px] bg-stone-200"
-                }`}
-              />
-              <span
-                className={`text-[12px] font-medium ${
-                  step >= 3 ? "text-yxane-ink" : "text-stone-400"
-                }`}
-              >
-                Pago
-              </span>
-            </button>
+            />
+            <StepButton
+              label="Yape"
+              isActive={step === 3}
+              isDone={false}
+              align="end"
+            />
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
+          {error && (
+            <p className="mb-5 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </p>
+          )}
+
           {step === 1 && (
             <div className="space-y-6">
               {items.length === 0 ? (
@@ -231,51 +266,43 @@ export function CartDrawer() {
                   Datos personales
                 </h3>
                 <div className="space-y-5">
-                  <Field label="Nombre completo" placeholder="Ej. Camila Rojas" />
-                  <Field label="DNI / CE" placeholder="Documento de identidad" />
-                  <Field label="WhatsApp" placeholder="+51 999 999 999" type="tel" />
+                  <Field
+                    label="Nombre completo"
+                    placeholder="Ej. Camila Rojas"
+                    value={form.customerName}
+                    onChange={(value) => updateField("customerName", value)}
+                  />
+                  <Field
+                    label="WhatsApp"
+                    placeholder="+51 999 999 999"
+                    type="tel"
+                    value={form.customerPhone}
+                    onChange={(value) => updateField("customerPhone", value)}
+                  />
+                  <Field
+                    label="DNI"
+                    placeholder="Documento de identidad"
+                    value={form.customerDni}
+                    onChange={(value) => updateField("customerDni", value)}
+                  />
                   <Field
                     label="Email"
                     placeholder="tucorreo@ejemplo.com"
                     type="email"
+                    value={form.customerEmail}
+                    onChange={(value) => updateField("customerEmail", value)}
                   />
                 </div>
               </div>
 
-              <div>
-                <h3 className="mb-4 text-[15px] font-medium text-yxane-ink">
-                  Método de pago
-                </h3>
-                <div className="rounded-lg border border-yxane-ink bg-white p-4">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <CreditCard size={18} className="text-yxane-ink" />
-                      <span className="text-[14px] font-medium text-yxane-ink">
-                        Tarjeta de crédito / débito
-                      </span>
-                    </div>
-                    <div className="h-4 w-4 rounded-full border-4 border-yxane-ink" />
-                  </div>
-
-                  <div className="space-y-4 border-t border-stone-100 pt-2">
-                    <Field
-                      label="Número de tarjeta"
-                      placeholder="0000 0000 0000 0000"
-                      inputClassName="font-mono text-[14px]"
-                    />
-                    <div className="grid grid-cols-2 gap-4">
-                      <Field
-                        label="Vencimiento"
-                        placeholder="MM/AA"
-                        inputClassName="font-mono text-[14px]"
-                      />
-                      <Field
-                        label="CVV"
-                        placeholder="123"
-                        inputClassName="font-mono text-[14px]"
-                      />
-                    </div>
-                  </div>
+              <div className="rounded-lg border border-yxane-line bg-white p-4">
+                <div className="flex items-start gap-3">
+                  <Smartphone size={18} className="mt-0.5 text-yxane-ink" />
+                  <p className="text-sm leading-6 text-stone-600">
+                    En el siguiente paso verás el número de Yape y el total.
+                    Después de yapear, finalizarás la compra por WhatsApp
+                    enviando tu captura para validación manual.
+                  </p>
                 </div>
               </div>
             </div>
@@ -283,37 +310,23 @@ export function CartDrawer() {
 
           {step === 3 && (
             <div className="animate-in space-y-8 duration-300 fade-in">
-              <div>
-                <h3 className="mb-3 text-[11px] font-bold uppercase tracking-wider text-yxane-ink">
-                  Método de entrega
-                </h3>
-                <div className="grid grid-cols-2 gap-3">
-                  <button
-                    className="flex flex-col items-center justify-center gap-2 rounded-xl border border-yxane-ink bg-white py-4 text-center transition-colors"
-                    type="button"
-                  >
-                    <MapPin size={22} className="text-yxane-ink" />
-                    <span className="text-[13px] font-medium text-yxane-ink">
-                      Delivery
-                    </span>
-                  </button>
-                  <button
-                    className="flex flex-col items-center justify-center gap-2 rounded-xl border border-stone-200 bg-transparent py-4 text-center text-stone-400 transition-colors hover:border-yxane-ink/50"
-                    type="button"
-                  >
-                    <Store size={22} />
-                    <span className="text-[13px] font-medium">Recojo</span>
-                  </button>
+              <div className="rounded-lg border border-yxane-ink bg-white p-5">
+                <div className="flex items-start gap-3">
+                  <Smartphone size={22} className="mt-0.5 text-yxane-ink" />
+                  <div>
+                    <h3 className="text-[15px] font-semibold text-yxane-ink">
+                      Yapea el total a este número
+                    </h3>
+                    <p className="mt-3 font-serif text-4xl text-yxane-ink">
+                      {yapeNumber}
+                    </p>
+                    <p className="mt-3 text-sm leading-6 text-stone-600">
+                      Realiza el Yape por {formatSoles(total)}. Luego presiona
+                      Finalizar compra para abrir WhatsApp con tu pedido y
+                      enviar la captura en el mensaje que dirá Captura de Yape.
+                    </p>
+                  </div>
                 </div>
-              </div>
-
-              <div className="space-y-5">
-                <Field placeholder="Dirección de envío" />
-                <div className="grid grid-cols-2 gap-4">
-                  <Field placeholder="Distrito" />
-                  <Field placeholder="Ciudad" />
-                </div>
-                <Field placeholder="Instrucciones especiales (Opcional)" />
               </div>
 
               <div className="rounded-xl bg-[#f2f1f0] p-5">
@@ -348,15 +361,30 @@ export function CartDrawer() {
                 </ul>
                 <div className="space-y-2 text-[13px] text-stone-500">
                   <SummaryRow label="Subtotal" value={formatSoles(subtotal)} />
-                  <SummaryRow label="Envío" value={formatSoles(shipping)} />
+                  <SummaryRow
+                    label="IGV incluido"
+                    value={formatSoles(getIncludedIgv(subtotal))}
+                  />
                 </div>
                 <div className="mt-4 flex justify-between border-t border-stone-200/60 pt-4">
                   <span className="font-serif text-xl font-bold text-yxane-ink">
-                    Total
+                    Total a yapear
                   </span>
                   <span className="font-serif text-xl text-yxane-ink">
                     {formatSoles(total)}
                   </span>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-yxane-line bg-white p-4">
+                <div className="flex items-start gap-3">
+                  <MessageCircle size={20} className="mt-0.5 text-yxane-ink" />
+                  <p className="text-sm leading-6 text-stone-600">
+                    Al confirmar se creará un pedido pendiente y se abrirá
+                    WhatsApp con los productos seleccionados y el texto
+                    Captura de Yape. Adjunta ahí tu captura para validación
+                    manual.
+                  </p>
                 </div>
               </div>
             </div>
@@ -367,26 +395,12 @@ export function CartDrawer() {
           <div className="shrink-0 border-t border-stone-200 bg-[#faf9f8] p-6 pb-8">
             {step === 1 && (
               <>
-                <div className="mb-6 space-y-3 text-[14px]">
-                  <SummaryRow label="Subtotal" value={formatSoles(subtotal)} />
-                  <SummaryRow
-                    label="Envío estimado"
-                    value={formatSoles(shipping)}
-                  />
-                  <div className="flex justify-between border-t border-stone-200 pt-3">
-                    <span className="font-serif text-xl font-bold text-yxane-ink">
-                      Total
-                    </span>
-                    <span className="font-serif text-xl font-bold text-yxane-ink">
-                      {formatSoles(total)}
-                    </span>
-                  </div>
-                </div>
+                <CartTotals subtotal={subtotal} total={total} />
                 <Button
                   className="flex w-full items-center justify-center gap-2 py-6 text-[15px]"
                   onClick={() => setStep(2)}
                 >
-                  Continuar con datos
+                  Continuar
                   <ArrowRight size={18} />
                 </Button>
               </>
@@ -394,15 +408,7 @@ export function CartDrawer() {
 
             {step === 2 && (
               <>
-                <div className="mb-6 space-y-2 text-[14px]">
-                  <SummaryRow label="Subtotal" value={formatSoles(subtotal)} />
-                  <div className="flex justify-between pt-3">
-                    <span className="text-[16px] text-yxane-ink">Total</span>
-                    <span className="font-serif text-xl font-bold text-yxane-ink">
-                      {formatSoles(total)}
-                    </span>
-                  </div>
-                </div>
+                <CartTotals subtotal={subtotal} total={total} />
                 <div className="flex gap-3">
                   <Button
                     variant="secondary"
@@ -413,9 +419,16 @@ export function CartDrawer() {
                   </Button>
                   <Button
                     className="flex flex-1 items-center justify-center gap-2 py-6 text-[15px]"
-                    onClick={() => setStep(3)}
+                    onClick={() => {
+                      if (validateStepTwo()) {
+                        setStep(3);
+                        setError("");
+                      } else {
+                        setError("Completa nombre, WhatsApp, DNI y email.");
+                      }
+                    }}
                   >
-                    Siguiente paso
+                    Revisar pedido
                     <ArrowRight size={18} />
                   </Button>
                 </div>
@@ -428,15 +441,21 @@ export function CartDrawer() {
                   variant="secondary"
                   className="px-5"
                   onClick={() => setStep(2)}
+                  disabled={isSubmitting}
                 >
                   Regresar
                 </Button>
                 <Button
                   className="flex flex-1 items-center justify-center gap-2 py-6 text-[15px]"
-                  onClick={() => window.alert("Compra finalizada.")}
+                  onClick={createOrder}
+                  disabled={isSubmitting}
                 >
+                  {isSubmitting ? (
+                    <Loader2 size={18} className="animate-spin" />
+                  ) : (
+                    <MessageCircle size={18} />
+                  )}
                   Finalizar compra
-                  <CheckCircle2 size={18} />
                 </Button>
               </div>
             )}
@@ -447,31 +466,110 @@ export function CartDrawer() {
   );
 }
 
+function StepButton({
+  label,
+  isActive,
+  isDone,
+  align,
+  onClick,
+}: {
+  label: string;
+  isActive: boolean;
+  isDone: boolean;
+  align: "start" | "center" | "end";
+  onClick?: () => void;
+}) {
+  return (
+    <button
+      className={`focus-ring flex flex-1 flex-col gap-2 rounded-sm ${
+        align === "start"
+          ? "items-start"
+          : align === "center"
+            ? "items-center"
+            : "items-end"
+      } ${onClick ? "cursor-pointer hover:opacity-80" : "cursor-default"}`}
+      onClick={onClick}
+      disabled={!onClick}
+      type="button"
+      aria-label={`Ir a ${label}`}
+    >
+      <div
+        className={`w-full rounded-full transition-all duration-300 ${
+          isActive
+            ? "h-[3.5px] bg-yxane-ink"
+            : isDone
+              ? "h-[2px] bg-emerald-700/30"
+              : "h-[2px] bg-stone-200"
+        }`}
+      />
+      <span
+        className={`text-[12px] font-medium ${
+          isActive || isDone ? "text-yxane-ink" : "text-stone-400"
+        }`}
+      >
+        {label}
+      </span>
+    </button>
+  );
+}
+
 function Field({
   label,
   placeholder,
   type = "text",
-  inputClassName = "",
+  value,
+  onChange,
 }: {
-  label?: string;
+  label: string;
   placeholder: string;
   type?: "email" | "tel" | "text";
-  inputClassName?: string;
+  value: string;
+  onChange: (value: string) => void;
 }) {
   return (
     <label className="block">
-      {label && (
-        <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-stone-500">
-          {label}
-        </span>
-      )}
+      <span className="mb-1.5 block text-[10px] font-bold uppercase tracking-wider text-stone-500">
+        {label}
+      </span>
       <input
         type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
-        className={`w-full border-b border-stone-200 bg-transparent py-2 text-[15px] text-yxane-ink placeholder:text-stone-400 focus:border-yxane-ink focus:outline-none ${inputClassName}`}
+        className="w-full border-b border-stone-200 bg-transparent py-2 text-[15px] text-yxane-ink placeholder:text-stone-400 focus:border-yxane-ink focus:outline-none"
       />
     </label>
   );
+}
+
+function CartTotals({
+  subtotal,
+  total,
+}: {
+  subtotal: number;
+  total: number;
+}) {
+  return (
+    <div className="mb-6 space-y-3 text-[14px]">
+      <SummaryRow label="Subtotal" value={formatSoles(subtotal)} />
+      <SummaryRow
+        label="IGV incluido"
+        value={formatSoles(getIncludedIgv(subtotal))}
+      />
+      <div className="flex justify-between border-t border-stone-200 pt-3">
+        <span className="font-serif text-xl font-bold text-yxane-ink">
+          Total
+        </span>
+        <span className="font-serif text-xl font-bold text-yxane-ink">
+          {formatSoles(total)}
+        </span>
+      </div>
+    </div>
+  );
+}
+
+function getIncludedIgv(totalWithIgv: number) {
+  return totalWithIgv - totalWithIgv / (1 + igvRate);
 }
 
 function SummaryRow({ label, value }: { label: string; value: string }) {

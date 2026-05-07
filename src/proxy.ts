@@ -90,11 +90,11 @@ export async function proxy(request: NextRequest) {
   const hasAdminSession = await hasValidAdminSession(request);
 
   if (hasAdminSession && !isAdminRoute) {
-    return NextResponse.redirect(new URL("/admin/productos", request.url));
+    return NextResponse.redirect(new URL("/admin/pedidos", request.url));
   }
 
   if (hasAdminSession && isAdminLoginRoute) {
-    return NextResponse.redirect(new URL("/admin/productos", request.url));
+    return NextResponse.redirect(new URL("/admin/pedidos", request.url));
   }
 
   return NextResponse.next();

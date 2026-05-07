@@ -34,3 +34,44 @@ model AdminUser {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 }
+
+model Order {
+  id              String      @id @default(cuid())
+  code            String      @unique
+  customerName    String
+  customerPhone   String
+  customerDni     String
+  customerEmail   String?
+  notes           String?
+  yapeHolderName  String
+  yapeOperation   String?
+  status          OrderStatus @default(PENDING)
+  subtotal        Decimal     @db.Decimal(10, 2)
+  total           Decimal     @db.Decimal(10, 2)
+  approvedAt      DateTime?
+  rejectedAt      DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  items           OrderItem[]
+}
+
+model OrderItem {
+  id           String  @id @default(cuid())
+  orderId      String
+  productId    String
+  productSlug  String
+  title        String
+  category     String
+  presentation String?
+  imageUrl      String
+  quantity     Int
+  unitPrice    Decimal @db.Decimal(10, 2)
+  lineTotal    Decimal @db.Decimal(10, 2)
+  order        Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+enum OrderStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}

@@ -51,10 +51,11 @@ export default async function Page() {
 
       <div className="mt-10 overflow-x-auto rounded-lg border border-yxane-line bg-white/85">
         <div className="min-w-[860px]">
-          <div className="grid grid-cols-[88px_1fr_140px_120px_190px] gap-4 border-b border-yxane-line px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-stone-500">
+          <div className="grid grid-cols-[88px_1fr_140px_100px_120px_190px] gap-4 border-b border-yxane-line px-5 py-3 text-xs font-semibold uppercase tracking-[0.12em] text-stone-500">
             <span>Imagen</span>
             <span>Producto</span>
             <span>Precio</span>
+            <span>Stock</span>
             <span>Estado</span>
             <span className="text-right">Acciones</span>
           </div>
@@ -62,7 +63,7 @@ export default async function Page() {
           {products.map((product) => (
             <div
               key={product.id}
-              className="grid grid-cols-[88px_1fr_140px_120px_190px] items-center gap-4 border-b border-yxane-line px-5 py-4 last:border-b-0"
+              className="grid grid-cols-[88px_1fr_140px_100px_120px_190px] items-center gap-4 border-b border-yxane-line px-5 py-4 last:border-b-0"
             >
               <div className="relative aspect-[4/5] overflow-hidden rounded bg-yxane-surface">
                 <Image
@@ -93,6 +94,10 @@ export default async function Page() {
                   </p>
                 )}
               </div>
+
+              <p className="text-sm font-semibold text-yxane-ink">
+                {product.stock ?? "Sin límite"}
+              </p>
 
               <form action={toggleProductStatus}>
                 <input type="hidden" name="id" value={product.id} />

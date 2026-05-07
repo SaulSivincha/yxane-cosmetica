@@ -15,13 +15,13 @@ type CartContextValue = {
   items: CartItem[];
   itemCount: number;
   subtotal: number;
-  shipping: number;
   total: number;
   isCartOpen: boolean;
   addItem: (product: Product) => void;
   removeItem: (productId: string) => void;
   increaseItem: (productId: string) => void;
   decreaseItem: (productId: string) => void;
+  clearCart: () => void;
   openCart: () => void;
   closeCart: () => void;
 };
@@ -83,24 +83,26 @@ export function CartProvider({ children }: { children: ReactNode }) {
     );
   }
 
+  function clearCart() {
+    setItems([]);
+  }
+
   const value = useMemo<CartContextValue>(() => {
     const subtotal = items.reduce(
       (sum, item) => sum + priceToNumber(item.product) * item.quantity,
       0,
     );
-    const shipping = items.length > 0 ? 10 : 0;
-
     return {
       items,
       itemCount: items.reduce((sum, item) => sum + item.quantity, 0),
       subtotal,
-      shipping,
-      total: subtotal + shipping,
+      total: subtotal,
       isCartOpen,
       addItem,
       removeItem,
       increaseItem,
       decreaseItem,
+      clearCart,
       openCart: () => setIsCartOpen(true),
       closeCart: () => setIsCartOpen(false),
     };

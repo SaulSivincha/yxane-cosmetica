@@ -40,7 +40,7 @@ export async function loginAdmin(
   }
 
   await createAdminSession(admin.id);
-  redirect("/admin/productos");
+  redirect("/admin/pedidos");
 }
 
 export async function registerAdmin(
@@ -79,7 +79,7 @@ export async function registerAdmin(
     return { error: "No se pudo crear el admin. Revisa si el email ya existe." };
   }
 
-  redirect("/admin/productos");
+  redirect("/admin/pedidos");
 }
 
 export async function logoutAdmin() {
